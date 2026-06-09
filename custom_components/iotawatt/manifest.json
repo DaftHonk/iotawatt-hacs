@@ -1,13 +1,13 @@
 {
   "domain": "iotawatt",
   "name": "IoTaWatt",
-  "codeowners": ["@llamafilm"],
+  "codeowners": ["@dafthonk", "@gtdiehl", "@jyavenard"],
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/iotawatt",
   "integration_type": "device",
   "iot_class": "local_polling",
-  "issue_tracker": "https://github.com/llamafilm/iotawatt-hacs/issues",
+  "issue_tracker": "https://github.com/dafthonk/iotawatt-hacs/issues",
   "loggers": ["iotawattpy"],
-  "requirements": ["git+https://github.com/home-assistant-libs/iotawattpy.git@main#iotawattpy==0.1.1"],
+  "requirements": ["ha-iotawattpy==0.1.2"],
   "version": "1.0.0"
 }
