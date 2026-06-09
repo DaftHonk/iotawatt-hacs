@@ -5,25 +5,44 @@ on:
     types:
       - "published"
 
+permissions:
+  contents: write
+
 jobs:
   release:
     name: "Release"
     runs-on: "ubuntu-latest"
     steps:
       - name: "Checkout the repository"
-        uses: "actions/checkout@v3.5.3"
+        uses: "actions/checkout@v6
 
       - name: "Adjust version number"
         shell: "bash"
         run: |
-          yq -i -o json '.version="${{ github.event.release.tag_name }}"' \
-            "${{ github.workspace }}/custom_components/iotawatt/manifest.json"
+          MANIFEST="${{ github.workspace }}/custom_components/iotawatt/manifest.json"
+          if [ ! -f "$MANIFEST" ]; then
+            echo "Error: manifest.json not found at $MANIFEST"
+            exit 1
+          fi
+          yq -i -o json '.version="${{ github.event.release.tag_name }}"' "$MANIFEST"
 
       - name: "ZIP the integration directory"
         shell: "bash"
         run: |
           cd "${{ github.workspace }}/custom_components/iotawatt"
-          zip iotawatt.zip -r ./
+          zip -r iotawatt.zip . \
+            -x "*.git*" "__pycache__/*" "*.pyc" "*.pytest_cache/*"
+
+      - name: "Verify ZIP file"
+        shell: "bash"
+        run: |
+          ZIP_FILE="${{ github.workspace }}/custom_components/iotawatt/iotawatt.zip"
+          if [ ! -f "$ZIP_FILE" ]; then
+            echo "Error: ZIP file was not created"
+            exit 1
+          fi
+          unzip -t "$ZIP_FILE" > /dev/null || exit 1
+          echo "✓ ZIP file is valid"
 
       - name: "Upload the ZIP file to the release"
         uses: softprops/action-gh-release@v0.1.15
